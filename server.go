@@ -23,10 +23,7 @@ func (s *Server) addRoutes() {
 		value := strings.TrimSpace(c.PostForm("email_login"))
 		domain := s.api.GetClientDomain(value)
 		if domain != "" {
-			c.Redirect(
-				http.StatusFound,
-				fmt.Sprintf(s.config.BaseURL, domain),
-			)
+			c.Redirect(http.StatusFound, domain)
 		} else {
 			c.HTML(http.StatusOK, "index.html", gin.H{
 				"error": "Неверный логин или email",

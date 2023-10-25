@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"webmalc/mb-redirector/common/logger"
 
@@ -61,21 +62,29 @@ func (s *API) GetClientDomain(emailLogin string) string {
 	if len(clients.Results) == 0 {
 		return ""
 	}
-	domain := clients.Results[0].LoginAlias
-	if domain == "" {
-		domain = clients.Results[0].Login
+	domain := clients.Results[0].URL
+	if domain != "" {
+		return domain
+	}
+	domain = clients.Results[0].LoginAlias
+	if domain != "" {
+		return fmt.Sprintf(s.config.BaseURL, domain)
+	}
+	domain = clients.Results[0].Login
+	if domain != "" {
+		return fmt.Sprintf(s.config.BaseURL, domain)
 	}
 
-	return domain
+	return ""
 }
 
 // NewAPI creates a new API.
-func NewAPI(config *Config, logger *logger.Logger) *API {
+func NewAPI(config *Config, log *logger.Logger) *API {
 	maxRetries := 3
 
 	return &API{
 		config: config,
-		logger: logger,
+		logger: log,
 		client: resty.New().SetRetryCount(maxRetries),
 	}
 }

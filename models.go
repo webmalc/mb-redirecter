@@ -6,6 +6,7 @@ type Client struct {
 	LoginAlias string
 	Email      string
 	ID         int
+	URL        string
 }
 
 // The clients model.
