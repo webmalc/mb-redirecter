@@ -28,6 +28,8 @@ func setDefaults(baseDir string) {
 	viper.Set("base_dir", filepath.Dir(filepath.Dir(baseDir))+"/")
 	viper.SetDefault("is_prod", false)
 	viper.SetDefault("timezone", "UTC")
+	viper.SetDefault("base_url", "https://%s.maxi-booking.ru")
+	viper.SetDefault("api_url", "https://billing.maxi-booking.com/en/clients/")
 	defaultPort := 9000
 	viper.SetDefault("port", defaultPort)
 	secondsInHour := 60

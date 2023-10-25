@@ -31,8 +31,10 @@
         <form  method="post">
           <div class="mb-3">
             <label for="email_login" class="form-label">Email или логин</label>
-            <input type="text" class="form-control" id="email_login" name="email_login">
-            <div class="text-danger form-text">Неверный логин или email</div>
+            <input type="text" class="form-control {{if .error }}is-invalid{{end}}" id="email_login" name="email_login" value="{{.value}}">
+            {{if .error }}
+              <div class="text-danger form-text">{{ .error }}</div>
+            {{end}}
           </div>
           <button type="submit" class="btn btn-primary mt-2">Перейти в Maxi-booking</button>
         </form>

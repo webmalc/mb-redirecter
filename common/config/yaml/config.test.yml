@@ -1,3 +1,4 @@
 is_prod: false
 timezone: Europe/Rome
 port: 9000
+api_token: token

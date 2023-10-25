@@ -1,0 +1,81 @@
+package main
+
+import (
+	"net/http"
+	"webmalc/mb-redirector/common/logger"
+
+	resty "github.com/go-resty/resty/v2"
+)
+
+// The API object.
+type API struct {
+	config *Config
+	client *resty.Client
+	logger *logger.Logger
+}
+
+func (s *API) getClients(email, login, alias string) *Clients {
+	clients := &Clients{}
+	if email == "" && login == "" {
+		return &Clients{}
+	}
+	url := s.config.APIUrl
+	if email != "" {
+		url += "?email=" + email
+	} else if login != "" {
+		url += "?login=" + login
+	} else if alias != "" {
+		url += "?alias=" + login
+	}
+
+	s.logger.Infof("Getting clients from %s", url)
+
+	resp, err := s.client.R().
+		SetResult(clients).
+		SetHeader("Accept", "application/json").
+		SetHeader("Authorization", "Token "+s.config.APIToken).
+		Get(url)
+
+	if err != nil {
+		return &Clients{}
+	}
+	if resp.StatusCode() != http.StatusOK {
+		return &Clients{}
+	}
+
+	return clients
+}
+
+// GetClientDomain returns client domain.
+func (s *API) GetClientDomain(emailLogin string) string {
+	if emailLogin == "" {
+		return ""
+	}
+	clients := s.getClients(emailLogin, "", "")
+	if len(clients.Results) == 0 {
+		clients = s.getClients("", emailLogin, "")
+	}
+	if len(clients.Results) == 0 {
+		clients = s.getClients("", "", emailLogin)
+	}
+	if len(clients.Results) == 0 {
+		return ""
+	}
+	domain := clients.Results[0].LoginAlias
+	if domain == "" {
+		domain = clients.Results[0].Login
+	}
+
+	return domain
+}
+
+// NewAPI creates a new API.
+func NewAPI(config *Config, logger *logger.Logger) *API {
+	maxRetries := 3
+
+	return &API{
+		config: config,
+		logger: logger,
+		client: resty.New().SetRetryCount(maxRetries),
+	}
+}

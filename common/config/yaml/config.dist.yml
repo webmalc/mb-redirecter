@@ -1,3 +1,4 @@
 is_prod: true
 timezone: UTC
 port: 9000
+api_token: token
